@@ -5,15 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script>
-        function traslacion(){
-            //Leer datos de vo 
-            var aos = document.getElementById("vo").value.split(",");
-            aon =[];
-            aos.forEach((elem) => {
-                aon.push(Number(elem))
-            });
-            alert(aon[0]+aon[1]+aon[2]);
+        function byId(id) {
+            return document.getElementById(id).value;
         }
+        function strarr2num(arreglo, lim)
+        {
+            //Leer datos de vo 
+            var arrs = arreglo.split(lim);
+            arrn =[];
+            arrs.forEach((elem) => {
+                arrn.push(Number(elem))
+            });
+            alert(arrn[0]+arrn[1]+arrn[2]);
+            return arrn;
+        }
+        function traslacion()
+        {
+            //var aos = document.getElementById("vo").value.split(",");
+            aon = strarr2num(byId("vo"), ",")
+            atn = strarr2num(byId("vt"), ",")
+            document.getElementById("vr").value= sum(aon, atn)
+
+        }
+        function escalado()
+        {
+            //var aos = document.getElementById("vo").value.split(",");
+            aon = strarr2num(byId("voe"), ",")
+            atn = strarr2num(byId("vte"), ",")
+            document.getElementById("vr").value= mul(aon, atn)
+
+        }
+        function sum(array1, array2)
+        {
+            return array1.map(function(num, idx){
+                return num + array2[idx]
+            });
+        };
+
+        function mul(array1, array2)
+        {
+            return array1.map(function(num, idx){
+                return num * array2[idx]
+            });
+        };
     </script>
 </head>
 <body>
