@@ -8,58 +8,173 @@
         function byId(id) {
             return document.getElementById(id).value;
         }
-        function strarr2num(arreglo, lim)
-        {
-            //Leer datos de vo 
+
+        function strarr2num(arreglo, lim) {
             var arrs = arreglo.split(lim);
-            arrn =[];
+            arrn = [];
             arrs.forEach((elem) => {
-                arrn.push(Number(elem))
+                arrn.push(Number(elem));
             });
-            alert(arrn[0]+arrn[1]+arrn[2]);
             return arrn;
         }
-        function traslacion()
-        {
-            //var aos = document.getElementById("vo").value.split(",");
-            aon = strarr2num(byId("vo"), ",")
-            atn = strarr2num(byId("vt"), ",")
-            document.getElementById("vr").value= sum(aon, atn)
 
+        function matrizTraslacion(tx, ty, tz) {
+            return [
+                [1, 0, 0, tx],
+                [0, 1, 0, ty],
+                [0, 0, 1, tz],
+                [0, 0, 0, 1]
+            ];
         }
-        function escalado()
-        {
-            //var aos = document.getElementById("vo").value.split(",");
-            aon = strarr2num(byId("voe"), ",")
-            atn = strarr2num(byId("vte"), ",")
-            document.getElementById("vr").value= mul(aon, atn)
 
+        function matrizEscalado(sx, sy, sz) {
+            return [
+                [sx, 0, 0, 0],
+                [0, sy, 0, 0],
+                [0, 0, sz, 0],
+                [0, 0, 0, 1]
+            ];
         }
-        function sum(array1, array2)
-        {
-            return array1.map(function(num, idx){
-                return num + array2[idx]
-            });
-        };
 
-        function mul(array1, array2)
-        {
-            return array1.map(function(num, idx){
-                return num * array2[idx]
-            });
-        };
+        function matrizRotacionX(theta) {
+            var cosTheta = Math.cos(theta);
+            var sinTheta = Math.sin(theta);
+            return [
+                [1, 0, 0, 0],
+                [0, cosTheta, -sinTheta, 0],
+                [0, sinTheta, cosTheta, 0],
+                [0, 0, 0, 1]
+            ];
+        }
+
+        function matrizRotacionY(theta) {
+            var cosTheta = Math.cos(theta);
+            var sinTheta = Math.sin(theta);
+            return [
+                [cosTheta, 0, sinTheta, 0],
+                [0, 1, 0, 0],
+                [-sinTheta, 0, cosTheta, 0],
+                [0, 0, 0, 1]
+            ];
+        }
+
+        function matrizRotacionZ(theta) {
+            var cosTheta = Math.cos(theta);
+            var sinTheta = Math.sin(theta);
+            return [
+                [cosTheta, -sinTheta, 0, 0],
+                [sinTheta, cosTheta, 0, 0],
+                [0, 0, 1, 0],
+                [0, 0, 0, 1]
+            ];
+        }
+
+        function multiplicarMatrizVector(matriz, vector) {
+            var resultado = [];
+            for (var i = 0; i < matriz.length; i++) {
+                var sum = 0;
+                for (var j = 0; j < vector.length; j++) {
+                    sum += matriz[i][j] * vector[j];
+                }
+                resultado.push(sum);
+            }
+            return resultado;
+        }
+
+        function traslacion() {
+            var vo = strarr2num(byId("vo"), ",");
+            var tx = parseFloat(byId("tx"));
+            var ty = parseFloat(byId("ty"));
+            var tz = parseFloat(byId("tz"));
+
+            var matrizTrasl = matrizTraslacion(tx, ty, tz);
+            vo.push(1);
+            var resultado = multiplicarMatrizVector(matrizTrasl, vo);
+
+            document.getElementById("vr_tr").value = resultado.slice(0, 3).join(", ");
+        }
+
+        function escalado() {
+            var voe = strarr2num(byId("voe"), ",");
+            var sx = parseFloat(byId("sx"));
+            var sy = parseFloat(byId("sy"));
+            var sz = parseFloat(byId("sz"));
+
+            var matrizEscal = matrizEscalado(sx, sy, sz);
+            voe.push(1);
+            var resultado = multiplicarMatrizVector(matrizEscal, voe);
+
+            document.getElementById("vr_sc").value = resultado.slice(0, 3).join(", ");
+        }
+
+        function rotacion() {
+            var vor = strarr2num(byId("vor"), ",");
+            var angleX = parseFloat(byId("angleX")) * (Math.PI / 180.0); // Convertir a radianes
+            var angleY = parseFloat(byId("angleY")) * (Math.PI / 180.0); // Convertir a radianes
+            var angleZ = parseFloat(byId("angleZ")) * (Math.PI / 180.0); // Convertir a radianes
+
+            var matrizRotX = matrizRotacionX(angleX);
+            var matrizRotY = matrizRotacionY(angleY);
+            var matrizRotZ = matrizRotacionZ(angleZ);
+
+            vor.push(1);
+            var resultado = multiplicarMatrizVector(matrizRotZ, multiplicarMatrizVector(matrizRotY, multiplicarMatrizVector(matrizRotX, vor)));
+
+            document.getElementById("vr_rot").value = resultado.slice(0, 3).join(", ");
+        }
     </script>
 </head>
 <body>
-    <p>Vector Original 
-        <input id="vo" size="10">  <!--Vector original-->
+    <p>Vector Original (Traslación)
+        <input id="vo" size="20"> <!-- Vector original -->
     </p>
-    <p>Vector Traslacion 
-        <input id="vt" size="10">  <!--Vector traslacion-->     
+    <p>Traslación en X
+        <input id="tx" size="10"> <!-- Traslación en X -->
     </p>
-    <p>Vector Trasladado
-        <input id="vr" size="10"> <!--Vector trasladado-->
+    <p>Traslación en Y
+        <input id="ty" size="10"> <!-- Traslación en Y -->
     </p>
-    <button id="btn_tr" onclick="traslacion()">Realizar traslacion</button>
+    <p>Traslación en Z
+        <input id="tz" size="10"> <!-- Traslación en Z -->
+    </p>
+    <p>Vector Resultante (Traslación)
+        <input id="vr_tr" size="20"> <!-- Vector resultante (Traslación) -->
+    </p>
+    <button id="btn_tr" onclick="traslacion()">Realizar traslación</button>
+
+    <p>Vector Original (Escalado)
+        <input id="voe" size="20"> <!-- Vector original (Escalado) -->
+    </p>
+    <p>Escalado en X
+        <input id="sx" size="10"> <!-- Escalado en X -->
+    </p>
+    <p>Escalado en Y
+        <input id="sy" size="10"> <!-- Escalado en Y -->
+    </p>
+    <p>Escalado en Z
+        <input id="sz" size="10"> <!-- Escalado en Z -->
+    </p>
+    <p>Vector Resultante (Escalado)
+        <input id="vr_sc" size="20"> <!-- Vector resultante (Escalado) -->
+    </p>
+    <button id="btn_sc" onclick="escalado()">Realizar escalado</button>
+
+    <p>Vector Original (Rotación)
+        <input id="vor" size="20"> <!-- Vector original (Rotación) -->
+    </p>
+    <p>Ángulo de Rotación en X (grados)
+        <input id="angleX" size="10"> <!-- Ángulo de Rotación en X -->
+    </p>
+    <p>Ángulo de Rotación en Y (grados)
+        <input id="angleY" size="10"> <!-- Ángulo de Rotación en Y -->
+    </p>
+    <p>Ángulo de Rotación en Z (grados)
+        <input id="angleZ" size="10"> <!-- Ángulo de Rotación en Z -->
+    </p>
+    <p>Vector Resultante (Rotación)
+        <input id="vr_rot" size="20"> <!-- Vector resultante (Rotación) -->
+    </p>
+    <button id="btn_rot" onclick="rotacion()">Realizar rotación</button>
 </body>
 </html>
+
